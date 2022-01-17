@@ -5,7 +5,7 @@ Exams application with Django
 Exams App with Django
 
 
-##Update your wsgi.py file with the content below
+## Update your wsgi.py file with the content below
 
 	activate_this = 'C:/path/to/your/environment/Scripts/activate_this.py'
 	# execfile(activate_this, dict(__file__=activate_this))
