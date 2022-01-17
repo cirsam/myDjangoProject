@@ -1,0 +1,41 @@
+<html>
+	<head>
+		<title>TigersVault Examination Center</title>
+	</head>
+	<body>
+		<div>
+		 <button onclick = "window.history.back(); return false;" style="float:right;margin: 20px;position:" >Back</button>
+		 <button onclick = "window.print(); return false;" style="float:right;margin: 20px;position:" >Print</button>
+		</div>
+		<br />
+		<br />
+		<div style="background:silver;margin: auto auto; width:50%;padding:20px;">
+			<div style="background:black;color:silver;height:100px;width:100%;text-align:center;">
+				<h1>TigersVault Examination Center</h1>
+			</div>
+			<div align="center" >
+				<table style="text-align:center;" >
+					<tr>
+						<th><h1>Certificate of completion for {{ context.name }}</h1></th>
+					</tr>
+					<tr>
+						<td><h3>This course: {{ context.courses.0.courses_name }} from {{ context.schools }}</h3></td>
+					</tr>
+					<tr>
+						<td>Was completed on {% now "jS F Y" %}</td>
+					</tr>
+					<tr>
+						<td>
+							<h2>Score: {{ context.score }}% </h2>
+							{% if context.score > 70 %}
+								<strong style="font-size:14px;color:green;" >Passed </strong>
+							{% else %}
+								<strong style="font-size:14px;color:red;" >Failed </strong>				
+							{% endif %}
+						</td>				
+					</tr>
+				</table>
+			</div>
+		</div>
+	</body>
+</html>

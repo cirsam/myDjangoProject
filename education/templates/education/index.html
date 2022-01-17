@@ -1,0 +1,214 @@
+{% extends 'rootbase.html' %}
+{% block content %}
+{% if user.is_authenticated %}
+				
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-md-1 col-xs-1 col-sm-1"></div>
+        <div class="col-md-10 col-xs-10 col-sm-10">
+            <h3 class="round3" style="text-align:center;">Education Dashboard 
+			{% if request.session.name is not null %}
+				for {{request.session.name}}s
+			{% endif %}
+			</h3>
+        </div>
+        <div class="col-md-1 col-xs-1 col-sm-1"></div>
+    </div>
+    <div class="row">
+        <div class="col-md-1 col-xs-8 col-sm-8"></div>
+        <div class="col-md-7 col-xs-5 col-sm-5">
+            <br />
+			<a href="{% url 'accounts:profile' %}">
+                <button type="button" class="btn btn-primary">
+                    <span class="glyphicon glyphicon-plus">Main Profile</span>
+                </button>
+            </a>
+			{% ifequal user.groups.all.0.name "schoolManager" %}
+            <a href="{% url 'education:schools_index' %}">
+                <button type="button" class="btn btn-success">
+                    <span class="glyphicon glyphicon-plus">Schools</span>
+                </button>
+            </a>
+			<a href="{% url 'education:class_index' %}">
+                <button type="button" class="btn btn-success">
+                    <span class="glyphicon glyphicon-plus">Classes</span>
+                </button>
+            </a>
+            <a href="{% url 'education:courses_index' %}">
+                <button type="button" class="btn btn-success">
+                    <span class="glyphicon glyphicon-plus">Courses</span>
+                </button>
+            </a>
+			{% endifequal %}
+			
+			{% ifnotequal user.groups.all.0.name "schoolManager" %}
+			<form action="/education/setuserType/" method="post" id="formAccess" style="display:inline;">
+				{% csrf_token %}
+				<select class="btn btn-success" name="accessType" onchange="SetPermSession()" >
+					<option>Who are you?</option>
+					<option value="" >Clear</option>
+					<option value="Student" >Student</option>
+					<option value="Teacher" >Teacher</option>
+				</select>				
+			</form>
+			{% endifnotequal %}
+			
+			{% ifequal request.session.name 'Teacher' %}
+			<a href="{% url 'education:schools_index' %}">
+                <button type="button" class="btn btn-success">
+                    <span class="glyphicon glyphicon-plus">Schools</span>
+                </button>
+            </a>
+            <a href="{% url 'education:class_index' %}">
+                <button type="button" class="btn btn-success">
+                    <span class="glyphicon glyphicon-plus">Classes</span>
+                </button>
+            </a>
+            <a href="{% url 'education:courses_index' %}">
+                <button type="button" class="btn btn-success">
+                    <span class="glyphicon glyphicon-plus">Courses</span>
+                </button>
+            </a>
+			{% endifequal %}
+			
+			{% ifequal request.session.name 'Student' %}
+			<button type="button" class="btn btn-success" id="getSchools" >
+				<span class="glyphicon glyphicon-plus">Take Exams</span>
+			</button>
+            <!-- <a href="{% url 'education:courses_index' %}"> -->
+                <!-- <button type="button" class="btn btn-success"> -->
+                    <!-- <span class="glyphicon glyphicon-plus">Practice</span> -->
+                <!-- </button> -->
+            <!-- </a> -->
+			{% endifequal %}
+        </div>
+    </div>
+    <br />
+	<form id="examsForms" method="GET" action="myexams" >
+		<div id="schoolsDropDown"></div>
+		<br />
+		<div id="classesDropDown"></div>
+		<br />
+		<div id="coursesDropDown"></div>
+		<br />
+		<button type="button" class="btn btn-success getExamsHide" id="getExams" onclick="SubmitgetExams()" >
+			<span class="glyphicon glyphicon-plus">Proceed</span>
+		</button>		
+	</form>
+</div>
+<script>
+
+	function SetPermSession(){
+		var formAccess = document.getElementById("formAccess");
+		formAccess.submit();
+	}
+	
+	
+	function SubmitgetExams(){
+		var courses = $("#coursesList").find(":selected").val();
+		location.href = "/education/myexams/schools/"+school+"/classes/"+classes+"/courses/"+courses;		
+	}
+	
+	$(document).ready(function($) {
+		
+		$( "#getSchools" ).click(function() {
+
+			//Create and append select list
+			var selectList = document.createElement("select");
+			selectList.id = "schoolsList";
+			selectList.name = "schools";
+			$( "#schoolsDropDown" ).html(selectList);
+			$( "#schoolsList" ).addClass("form-control");
+			
+			var option = document.createElement("option");
+			option.value = "Select Your School";
+			option.text = "Select Your School";
+			selectList.appendChild(option);
+
+		  $.get("/education/getschools/", function(response) {
+			var schools_data = JSON.parse(response.schools_data);
+			
+			for (var i=0; i<schools_data.length; i++) { 
+				var obj = schools_data[i]; 
+				var fields = obj.fields;
+				var pk = obj.pk;  
+				var schools_name = fields.schools_name;
+				
+				var option = document.createElement("option");
+				option.value = pk;
+				option.text = schools_name;
+				selectList.append(option);
+			}
+		  }); 
+		});	
+		
+		$(document).on('change','#schoolsList',function() {
+			//Create and append select list
+			var selectList = document.createElement("select");
+			selectList.id = "classesList";
+			selectList.name = "classes";
+			$( "#classesDropDown" ).html(selectList);
+			$( "#classesList" ).addClass("form-control");
+		
+			var option = document.createElement("option");
+			option.value = "Select Your Class";
+			option.text = "Select Your Class";
+			selectList.appendChild(option);
+			school = $("#schoolsList").find(":selected").val();
+			
+		  $.get("/education/getclasses/"+school, function(response) {
+			var classes_data = JSON.parse(response.classes_data);
+			
+			for (var i=0; i<classes_data.length; i++) { 
+				var obj = classes_data[i]; 
+				var fields = obj.fields;
+				var pk = obj.pk;  
+				var class_name = fields.class_name;
+				
+				var option = document.createElement("option");
+				option.value = pk;
+				option.text = class_name;
+				selectList.appendChild(option);
+			}
+		  }); 
+		});	
+		
+		$(document).on('change','#classesList',function() {
+			//Create and append select list
+			var selectList = document.createElement("select");
+			selectList.id = "coursesList";		
+			selectList.name = "courses";		
+			$( "#coursesDropDown" ).html(selectList);
+			$( "#coursesList" ).addClass("form-control");
+			
+			var option = document.createElement("option");
+			option.value = "Select Your Course";
+			option.text = "Select Your Course";
+			selectList.appendChild(option);
+			classes = $("#classesList").find(":selected").val();
+
+		  $.get("/education/getcourses/schools/"+school+"/classes/"+classes, function(response) {
+			var courses_data = JSON.parse(response.courses_data);
+			
+			for (var i=0; i<courses_data.length; i++) { 
+				var obj = courses_data[i]; 
+				var fields = obj.fields;
+				var pk = obj.pk;  
+				var courses_name = fields.courses_name;
+				
+				var option = document.createElement("option");
+				option.value = pk;
+				option.text = courses_name;
+				selectList.appendChild(option);
+			}			
+		  });		  
+		});
+		
+		$(document).on('change','#coursesList',function() {
+			$("#getExams").removeClass("getExamsHide");
+		});
+	});
+
+</script>
+	{% endif %}
+{% endblock %}

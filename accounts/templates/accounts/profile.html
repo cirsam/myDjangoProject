@@ -1,0 +1,26 @@
+{% extends 'rootbase.html' %}
+
+{% block content %}
+
+
+{% if error %}
+{{ error }}
+
+<br/>
+<br/>
+{% endif %}
+	{% if user.is_authenticated %}
+		<h1>you are login </h1>
+				
+        <div class="col-md-1 col-xs-1 col-sm-1">
+            <a href="{% url 'education:index' %}">
+                <button type="button" class="btn btn-info">
+                    <span class="glyphicon glyphicon-open">Education center</span>
+                </button>
+            </a>
+        </div>
+	{% else %}
+		<div>You are not loggedin </div>
+		<!-- Do something which you want to do with unauthenticated user -->
+	{% endif %}
+{% endblock %}

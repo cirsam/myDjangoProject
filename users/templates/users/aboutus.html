@@ -1,0 +1,5 @@
+{% extends 'rootbase.html' %}
+
+{% block content %}
+	About, {{ user.username|default:'Guest' }}!
+{% endblock %}

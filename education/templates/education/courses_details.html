@@ -1,0 +1,92 @@
+{% extends 'rootbase.html' %}
+{% block content %}
+{% if user.is_authenticated %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-md-1 col-xs-1 col-sm-1"></div>
+        <div class="col-md-10 col-xs-10 col-sm-10">
+            <h3 class="round3" style="text-align:center;">{{courses.courses_name}} - Questions</h3>
+        </div>
+        <div class="col-md-1 col-xs-1 col-sm-1"></div>
+    </div>
+	
+    <div class="row">
+        <div class="col-md-1 col-xs-1 col-sm-1"></div>
+        <div class="col-md-8 col-xs-5 col-sm-5">
+            <br />
+			<a href="{% url 'accounts:profile' %}">
+                <button type="button" class="btn btn-primary">
+                    <span class="glyphicon glyphicon-plus">Main</span>
+                </button>
+            </a>
+			<a href="{% url 'education:index' %}">
+                <button type="button" class="btn btn-primary">
+                    <span class="glyphicon glyphicon-plus">Education Dashboard</span>
+                </button>
+            </a>
+            <a href="{% url 'education:questions_create' courses.pk %}">
+                <button type="button" class="btn btn-success">
+                    <span class="glyphicon glyphicon-plus">Create Questions</span>
+                </button>
+            </a>			
+            <a href="{% url 'education:schools_index' %}">
+                <button type="button" class="btn btn-success">
+                    <span class="glyphicon glyphicon-plus">Schools</span>
+                </button>
+            </a>
+            <a href="{% url 'education:class_index' %}">
+                <button type="button" class="btn btn-success">
+                    <span class="glyphicon glyphicon-plus">Classes</span>
+                </button>
+            </a>
+            <a href="{% url 'education:courses_index' %}">
+                <button type="button" class="btn btn-success">
+                    <span class="glyphicon glyphicon-plus">Courses</span>
+                </button>
+            </a>
+        </div>
+    </div>
+    <br />
+    {% for question in question_datails %}
+    <div class="row">
+        <div class="col-md-1 col-xs-1 col-sm-1"></div>
+        <div class="col-md-7 col-xs-7 col-sm-7">
+            <ul class="list-group">
+                <li class="list-group-item ">
+                    {{ question.questions_name }}
+                </li>
+                <li class="list-group-item ">
+                    <a href="{% url 'education:questions_details' question.pk %}">View Answers </a> <span class="badge"></span>
+                </li>
+            </ul>
+            <br>
+        </div>
+		<!-- <div class="col-md-2 col-xs-2 col-sm-2"> -->
+            <!-- <a href="{% url 'education:answers_create' question.pk %}"> -->
+                <!-- <button type="button" class="btn btn-info"> -->
+                    <!-- <span class="glyphicon glyphicon-open">Add Answers</span> -->
+                <!-- </button> -->
+            <!-- </a> -->
+        <!-- </div> -->
+		{% if request.user.is_superuser or user.id|add:"0" == question.userId|add:"0" %}
+        <div class="col-md-1">
+            <a href="{% url 'education:questions_edit' question.pk %}">
+                <button type="button" class="btn btn-info">
+                    <span class="glyphicon glyphicon-pencil">Edit</span>
+                </button>
+            </a>
+        </div>
+        <div class="col-md-1">
+            <a href="{% url 'education:questions_delete' question.pk %}">
+                <button type="button" class="btn btn-danger">
+                    <span class="glyphicon glyphicon-trash">Delete</span>
+                </button>
+            </a>
+        </div>
+		{% endif %}
+        <div class="col-md-1 col-xs-1 col-sm-1"></div>
+    </div>
+    {% endfor %}
+</div>
+	{% endif %}
+{% endblock %}

@@ -1,0 +1,33 @@
+{% extends 'rootbase.html' %}
+{% block content %}
+{% if user.is_authenticated %}
+<div class="container">
+    <div class="row"></div>
+    <br />
+    <div class="row">
+        <div class="col-md-7 col-xs-7 col-sm-7"></div>
+		<div class="col-md-1 col-xs-1 col-sm-1">
+			<a href="javascript:history.back()">
+                <button type="button" class="btn btn-info">
+                    <span class="glyphicon glyphicon-plus">Back to Schools</span>
+                </button>
+            </a>
+        </div>
+        <div class="col-md-10 col-xs-10 col-sm-10">
+            <form method="post">
+                {% csrf_token %}
+                <div class="form-row">
+                    <div class="alert alert-warning">
+                        Are you sure you want to delete {{ object }}?
+                    </div>
+                </div>
+                <button type="submit" class="btn btn-danger">
+                    <span class="glyphicon glyphicon-trash">Delete</span>
+                </button>
+            </form>
+        </div>
+    </div>
+</div>
+{% endif %}
+{% endblock %}
+

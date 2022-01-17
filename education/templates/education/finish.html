@@ -1,0 +1,92 @@
+{% extends 'rootbase.html' %}
+{% block content %}
+{% if user.is_authenticated %}
+<div class="container-fluid">
+    <div class="row">
+		<div class="row">
+			<div class="col-md-10 col-xs-10 col-sm-10">
+				<h3 class="round3" style="text-align:center;">{{ context.courses.0.courses_name}} - Questions</h3>
+			</div>
+			<div class="col-md-10 col-xs-10 col-sm-10">
+				<a href="{% url 'accounts:profile' %}">
+					<button type="button" class="btn btn-primary">
+						<span class="glyphicon glyphicon-plus">Main Profile</span>
+					</button>
+				</a>			
+				<a href="{% url 'education:index' %}">
+					<button type="button" class="btn btn-primary">
+						<span class="glyphicon glyphicon-plus">Education Dashboard</span>
+					</button>
+				</a>
+			</div>
+			<br />
+			<br />
+			<div class="col-md-10 col-xs-10 col-sm-10">
+					<div class="col-md-6 col-xs-10 col-sm-10" style="display:inline-block;" >
+						<input type="text" name="fullname" id="fullname" class="form-control" onkeyup="myCertificate();" placeholder="Enter FullName to Print Your Certificate" />
+						<input type="hidden" name="session" value="{{ request.resolver_match.kwargs.session_id }}" />
+					</div>
+					<div class="col-md-2 col-xs-1 col-sm-1" style="display:inline-block;margin: 0 0 0 -30px" >
+						<button class="btn btn-success" id="printCertificate" disabled onclick="printCertificate()" >Get Certificate</button>
+					</div>
+			</div>
+			<div class="col-md-10 col-xs-10 col-sm-10"><span style="font-size:11px;color:red;" >Your score is: <strong>{{ context.score }}%</strong></span>
+				{% if context.score > 70 %}
+					<strong style="font-size:11px;color:green;" >Passed </strong>
+				{% else %}
+					<strong style="font-size:11px;color:red;" >Failed </strong>				
+				{% endif %}			
+			</div>
+			<div class="col-md-10 col-xs-10 col-sm-10"><span style="font-size:11px;color:red;" >Your Test Session ID:</span> {{request.session.test_session}}</div>
+		</div>
+    </div>
+	<br />
+    {% for obj in context.newObj %}
+    <div class="row">
+        <div class="col-md-1 col-xs-1 col-sm-1"></div>
+        <div class="col-md-7 col-xs-7 col-sm-7">
+            <ul class="list-group">
+                <li class="list-group-item ">
+                  <span>{{ forloop.counter }})</span>  {{ obj.question }}
+                </li>
+				{% if obj.status == "Correct" %}
+                <li class="list-group-item" style="color:green;">
+                  <span>Status:</span>  <strong>{{ obj.status }}</strong>
+                </li>
+				{% else %}
+					<li class="list-group-item" style="color:red;">
+					  <span>Status:</span>  <strong>{{ obj.status }}</strong>
+					</li>
+				{% endif %}
+            </ul>
+            <br>
+        </div>
+        <div class="col-md-1 col-xs-1 col-sm-1"></div>
+    </div>
+    {% endfor %}
+	<script>
+	$(document).ready(function($) {		
+		myCertificate = function(){
+			if($("#fullname").val()!=null || $("#fullname").val()!=""){
+				$('#printCertificate').prop('disabled', false);
+			}	
+		}
+
+		printCertificate = function(){
+			var url = window.location.href.substr(0, window.location.href.indexOf('#'));
+
+			if(url==null || url==""){
+				url = window.location.href;
+			}
+			var geturl = url.split('/');
+			var schools = geturl[6];
+			var classes = geturl[8];
+			var courses = geturl[10];		
+			var session = geturl[12];
+			location.href = "/education/printCertificate/schools/"+schools+"/classes/"+classes+"/courses/"+courses+"/session/"+session+"/fullname/"+$("#fullname").val();		
+		}
+	});
+</script>
+</div>
+	{% endif %}
+{% endblock %}
