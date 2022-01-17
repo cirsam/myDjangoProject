@@ -1,0 +1,76 @@
+{% extends 'rootbase.html' %}
+{% block content %}
+{% if user.is_authenticated %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-md-1 col-xs-1 col-sm-1"></div>
+        <div class="col-md-10 col-xs-10 col-sm-10">
+            <h3 class="round3" style="text-align:center;">Classes</h3>
+        </div>
+        <div class="col-md-1 col-xs-1 col-sm-1"></div>
+    </div>
+    <div class="row">
+        <div class="col-md-1 col-xs-8 col-sm-8"></div>
+        <div class="col-md-7 col-xs-5 col-sm-5">
+            <br />
+			<a href="{% url 'accounts:profile' %}">
+                <button type="button" class="btn btn-primary">
+                    <span class="glyphicon glyphicon-plus">Main</span>
+                </button>
+            </a>
+			<a href="{% url 'education:index' %}">
+                <button type="button" class="btn btn-primary">
+                    <span class="glyphicon glyphicon-plus">Education Dashboard</span>
+                </button>
+            </a>			
+            <a href="{% url 'education:class_create' %}">
+                <button type="button" class="btn btn-success">
+                    <span class="glyphicon glyphicon-plus">Create Classes</span>
+                </button>
+            </a>
+            <a href="{% url 'education:schools_index' %}">
+                <button type="button" class="btn btn-success">
+                    <span class="glyphicon glyphicon-plus">Schools</span>
+                </button>
+            </a>
+            <a href="{% url 'education:courses_index' %}">
+                <button type="button" class="btn btn-success">
+                    <span class="glyphicon glyphicon-plus">Courses</span>
+                </button>
+            </a>
+        </div>
+    </div>
+    <br />
+    {% for class_item in classes_list %}
+    <div class="row">
+        <div class="col-md-1 col-xs-1 col-sm-1"></div>
+        <div class="col-md-7 col-xs-7 col-sm-7">
+            <ul class="list-group">
+                <li class="list-group-item ">
+                  <strong>School: </strong> {{ class_item.schoolsList.0.schools_name }} <br /><strong>Class: </strong>{{ class_item.class.class_name }} <span class="badge"></span>
+                </li>
+            </ul>
+            <br>
+        </div>
+		{% if request.user.is_superuser or user.id|add:"0" == class_item.class.userId|add:"0" %}
+        <div class="col-md-1">
+            <a href="{% url 'education:class_edit' class_item.class.pk %}">
+                <button type="button" class="btn btn-info">
+                    <span class="glyphicon glyphicon-pencil">Edit</span>
+                </button>
+            </a>
+        </div>
+        <div class="col-md-1">
+            <a href="{% url 'education:class_delete' class_item.class.pk %}">
+                <button type="button" class="btn btn-danger">
+                    <span class="glyphicon glyphicon-trash">Delete</span>
+                </button>
+            </a>
+        </div>
+		{% endif %}
+        <div class="col-md-1 col-xs-1 col-sm-1"></div>
+    </div>
+    {% endfor %}
+</div>
+	{% endif %}
+{% endblock %}

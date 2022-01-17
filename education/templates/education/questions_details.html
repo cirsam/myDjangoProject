@@ -1,0 +1,101 @@
+{% extends 'rootbase.html' %}
+{% block content %}
+{% if user.is_authenticated %}
+
+{% if form.errors %}
+    {% for field in form %}
+        {% for error in field.errors %}
+            <p> {{ error }} </p>
+        {% endfor %}
+    {% endfor %}
+{% endif %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-md-1 col-xs-1 col-sm-1"></div>
+        <div class="col-md-10 col-xs-10 col-sm-10">
+            <h3 class="round3" style="text-align:center;">{{questions.questions_name}} - Answers</h3>
+        </div>
+        <div class="col-md-1 col-xs-1 col-sm-1"></div>
+    </div>
+    <div class="row">
+        <div class="col-md-1 col-xs-1 col-sm-1"></div>
+        <div class="col-md-8 col-xs-5 col-sm-5">
+            <br />
+			<a href="{% url 'accounts:profile' %}">
+                <button type="button" class="btn btn-primary">
+                    <span class="glyphicon glyphicon-plus">Main</span>
+                </button>
+            </a>
+			<a href="{% url 'education:index' %}">
+                <button type="button" class="btn btn-primary">
+                    <span class="glyphicon glyphicon-plus">Education Dashboard</span>
+                </button>
+            </a>
+            <a href="{% url 'education:answers_create' questions.pk %}">
+                <button type="button" class="btn btn-success">
+                    <span class="glyphicon glyphicon-plus">Create Answers</span>
+                </button>
+            </a>			
+            <a href="{% url 'education:schools_index' %}">
+                <button type="button" class="btn btn-success">
+                    <span class="glyphicon glyphicon-plus">Schools</span>
+                </button>
+            </a>
+            <a href="{% url 'education:class_index' %}">
+                <button type="button" class="btn btn-success">
+                    <span class="glyphicon glyphicon-plus">Classes</span>
+                </button>
+            </a>
+            <a href="{% url 'education:courses_index' %}">
+                <button type="button" class="btn btn-success">
+                    <span class="glyphicon glyphicon-plus">Courses</span>
+                </button>
+            </a>
+        </div>
+    </div>
+    <br />
+    {% for answers in answers_datails %}
+    <div class="row">
+        <div class="col-md-1 col-xs-1 col-sm-1"></div>
+        <div class="col-md-6 col-xs-6 col-sm-6">
+            <ul class="list-group">
+                <li class="list-group-item ">
+                    {{ answers.answers_name }}
+                </li>
+					{% if questions.correct_answer|add:"0" == answers.id %}
+						<li class="list-group-item ">
+							<span class="badge">Correct</span>
+						</li>
+					{% endif %}
+            </ul>
+            <br>
+        </div>
+		{% if request.user.is_superuser or user.id|add:"0" == answers.userId|add:"0" %}
+        <div class="col-md-2">
+            <form action="{% url 'education:correct_answer' questions.pk %}" method="post">
+				{% csrf_token %}
+				<input type="hidden" value="{{ answers.id }}" name="correct_answer" />
+                <input type="submit" class="btn btn-info" name="post" value="Set as Correct Answer">
+            </form>
+        </div>
+        <div class="col-md-1">
+            <a href="{% url 'education:answers_edit' answers.pk %}">
+                <button type="button" class="btn btn-info">
+                    <span class="glyphicon glyphicon-pencil">Edit</span>
+                </button>
+            </a>
+        </div>
+        <div class="col-md-1">
+            <a href="{% url 'education:answers_delete' answers.pk %}">
+                <button type="button" class="btn btn-danger">
+                    <span class="glyphicon glyphicon-trash">Delete</span>
+                </button>
+            </a>
+        </div>
+		{% endif %}
+        <div class="col-md-1 col-xs-1 col-sm-1"></div>
+    </div>
+    {% endfor %}
+</div>
+	{% endif %}
+{% endblock %}

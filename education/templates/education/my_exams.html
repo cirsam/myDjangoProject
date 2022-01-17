@@ -1,0 +1,130 @@
+{% extends 'rootbase.html' %}
+{% block content %}
+{% if user.is_authenticated %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-md-10 col-xs-10 col-sm-10">
+            <h3 class="round3" style="text-align:center;">{{courses.0.courses_name}} - Questions {{request.session.finished}}</h3>
+        </div>
+			<div class="col-md-4 col-xs-4 col-sm-4">
+				<a href="{% url 'accounts:profile' %}">
+					<button type="button" class="btn btn-primary">
+						<span class="glyphicon glyphicon-plus">Main Profile</span>
+					</button>
+				</a>
+				<a href="{% url 'education:index' %}">
+					<button type="button" class="btn btn-primary">
+						<span class="glyphicon glyphicon-plus">Education Dashboard</span>
+					</button>
+				</a>				
+			</div>		
+        <div class="col-md-10 col-xs-10 col-sm-10"><span style="font-size:11px;color:red;" >Note: Your session ID will expire after your test. Write it down</span></div>
+        <div class="col-md-10 col-xs-10 col-sm-10"><span style="font-size:11px;color:red;" >Your Test Session ID:</span> {{request.session.test_session}}</div>
+    </div>
+    {% for question in questions_list %}
+    <div class="row">
+        <div class="col-md-1 col-xs-1 col-sm-1"></div>
+        <div class="col-md-7 col-xs-7 col-sm-7">
+            <ul class="list-group">
+                <li class="list-group-item ">
+                  <span>{{ forloop.counter }})</span>  {{ question.questions_name }}
+                </li>
+                <li class="list-group-item" id="answers_{{ question.id }}" >
+                    <a href="#" onclick="getAnswers(this.id)" id="{{ question.id }}">Answers Question </a> <span class="badge"></span>
+                </li>
+            </ul>
+            <br>
+        </div>
+        <div class="col-md-1 col-xs-1 col-sm-1"></div>
+    </div>
+    {% endfor %}
+	
+	<button type="button" class="btn btn-success" onclick="finishExams()" >
+		<span class="glyphicon glyphicon-plus">Finish</span>
+	</button>
+<script>
+	$(document).ready(function($) {
+	
+		finishExams = function(){
+			var url = window.location.href.substr(0, window.location.href.indexOf('#'));
+			if(url==null || url==""){
+				url = window.location.href;
+			}
+			var geturl = url.split('/');
+			var schools = geturl[6];
+			var classes = geturl[8];
+			var courses = geturl[10];	
+			location.href = "/education/finish/schools/"+schools+"/classes/"+classes+"/courses/"+courses+"/session/{{request.session.test_session}}";		
+		}
+	
+		getAnswers = function(id){
+			$.get("/education/getanswers/"+id, function(response) {
+				var answers_data = JSON.parse(response.answers_data);
+				$("#answers_"+id).html("");
+					
+				for (var i=0; i<answers_data.length; i++) { 
+					var obj = answers_data[i]; 
+					var fields = obj.fields;
+					var pk = obj.pk;  
+					var answers_name = fields.answers_name;
+					$("#answers_"+id).append('<br /><input type="radio" name="answers_'+id+'"  id="'+pk+'" onchange="saveanswers(this.name,this.id)"  />  <span>'+answers_name+'</span>');
+				}
+			}); 		
+		}
+
+		saveanswers = function(question_data,answer_id){
+			var question_id = question_data.split("_")[1];
+			var jsonObject = {questions_id:question_id, answers_id:answer_id};
+					
+			$.ajax({
+				url: "/education/saveanswers/",
+				type: 'POST',
+				data: jsonObject,
+				dataType: 'json',
+				async: true,
+				beforeSend: function (request) {
+					request.setRequestHeader("X-CSRFToken", "{{ csrf_token }}");
+					request.setRequestHeader("RequestVerificationToken", $("[name='__RequestVerificationToken']").val());
+				},
+				success: function (data) {
+					var errors = jQuery.parseJSON(data)
+					console.log(errors);
+				}	
+			});	
+		}
+
+		$( "#getSchools" ).click(function() {
+			//Create and append select list
+			var selectList = document.createElement("select");
+			selectList.id = "schoolsList";
+			selectList.name = "schools";
+			$( "#schoolsDropDown" ).html(selectList);
+			$( "#schoolsList" ).addClass("form-control");
+			
+			var option = document.createElement("option");
+			option.value = "Select Your School";
+			option.text = "Select Your School";
+			selectList.appendChild(option);
+
+		  $.get("/education/getschools/", function(response) {
+			var schools_data = JSON.parse(response.schools_data);
+			
+			for (var i=0; i<schools_data.length; i++) { 
+				var obj = schools_data[i]; 
+				var fields = obj.fields;
+				var pk = obj.pk;  
+				var schools_name = fields.schools_name;
+				
+				var option = document.createElement("option");
+				option.value = pk;
+				option.text = schools_name;
+				selectList.append(option);
+			}
+		  }); 
+		});	
+	});
+</script>	
+	
+</div>
+	{% endif %}
+{% endblock %}
