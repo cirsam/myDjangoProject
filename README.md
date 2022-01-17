@@ -4,7 +4,6 @@ Exams application with Django
 =======
 Exams App with Django
 
-
 ## Update your wsgi.py file with the content below
 
 	activate_this = 'C:/path/to/your/environment/Scripts/activate_this.py'
@@ -89,6 +88,3 @@ Exams App with Django
 		</Directory>  
 	</VirtualHost>
 	# end virtual SupervisionTool
-
-
-
