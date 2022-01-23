@@ -1,4 +1,4 @@
-# myDjangoProject
+# Python myDjangoProject
 
 Exams application with Django
 =======
